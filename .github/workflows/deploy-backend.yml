@@ -41,4 +41,4 @@ jobs:
           SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/musicdb
           SPRING_DATASOURCE_USERNAME: root
           SPRING_DATASOURCE_PASSWORD: dnyanesh
-        run: ./gradlew build
+        run: gradlew build
