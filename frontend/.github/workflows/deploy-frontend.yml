@@ -1,0 +1,33 @@
+name: Deploy Frontend to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
+
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: npm install
+
+    - name: Build React app
+      working-directory: ./frontend
+      run: npm run build
+
+    - name: Deploy to GitHub Pages
+      working-directory: ./frontend
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: npx gh-pages -d build --repo https://github.com/Dnyanesh099/vibeTubeMusic.git
