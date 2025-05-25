@@ -26,11 +26,10 @@ jobs:
         run: npm run build
         working-directory: ./frontend
 
-      - name: Set git user info locally
+      - name: Set git user info globally
         run: |
-          git config user.email "dnyaneshpatil556@gmail.com"
-          git config user.name "Dnyanesh099"
-        working-directory: ./frontend
+          git config --global user.email "dnyaneshpatil556@gmail.com"
+          git config --global user.name "Dnyanesh099"
 
       - name: Deploy to GitHub Pages
         run: npx gh-pages -d build --repo https://github.com/Dnyanesh099/vibeTubeMusic.git
