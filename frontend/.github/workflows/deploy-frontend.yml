@@ -3,14 +3,14 @@ name: Deploy Frontend to GitHub Pages
 on:
   push:
     branches:
-      - main  # or your default branch
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Node.js
@@ -26,13 +26,8 @@ jobs:
         run: npm run build
         working-directory: ./frontend
 
-      - name: Configure Git user info
-        run: |
-          git config --global user.email "dnyaneshpatil556@gmail.com"
-          git config --global user.name "Dnyanesh099"
-
       - name: Deploy to GitHub Pages
-        run: npx gh-pages -d build --repo https://github.com/Dnyanesh099/vibeTubeMusic.git
-        working-directory: ./frontend
-
-
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend/build
