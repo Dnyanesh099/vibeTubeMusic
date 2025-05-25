@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -23,6 +24,11 @@ jobs:
       - name: Build frontend
         run: npm run build
         working-directory: ./frontend
+
+      - name: Set git user info
+        run: |
+          git config --global user.email "dnyaneshpatil556@gmail.com"
+          git config --global user.name "Dnyanesh099"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
