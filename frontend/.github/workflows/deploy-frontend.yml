@@ -30,6 +30,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+            
       - name: Deploy to GitHub Pages
         run: |
-          npx gh-pages -d build --repo=https://github.com/Dnyanesh099/vibeTubeMusic.git
+          npx gh-pages -d build \
+            --repo https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Dnyanesh099/vibeTubeMusic.git
