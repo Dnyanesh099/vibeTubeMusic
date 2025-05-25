@@ -1,41 +1,28 @@
-name: Build React Frontend and Spring Boot Backend
+name: Build and Deploy Backend
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      # Build React frontend
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Install and Build Frontend
-        working-directory: frontend
-        run: |
-          npm install
-          npm run build
-
-      # Build Spring Boot backend
-      - name: Setup Java
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Give gradlew permission
-        run: chmod +x backend/gradlew
-
-      - name: Build Backend
-        working-directory: backend
+      - name: Build with Gradle wrapper
+        working-directory: backend/musicapp
         run: ./gradlew build
+
+      # Add deployment steps here, for example:
+      # - name: Deploy backend
+      #   run: your deployment commands (e.g., SSH, copy files, Docker build & push)
