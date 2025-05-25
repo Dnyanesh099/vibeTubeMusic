@@ -2,24 +2,22 @@ name: Deploy Frontend
 
 on:
   push:
-    branches: [main]  # or 'master' or any branch you use
+    branches: [main]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: frontend
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Setup Node
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18' # Match your project version
+          node-version: 18
 
       - name: Install dependencies
         run: npm install
@@ -27,5 +25,11 @@ jobs:
       - name: Build
         run: npm run build
 
-      # Example: Deploy to GitHub Pages, S3, Vercel, etc.
-      # Add your specific deployment steps here
+      - name: Configure Git Identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy to GitHub Pages
+        run: |
+          npx gh-pages -d build --repo=https://github.com/Dnyanesh099/vibeTubeMusic.git
