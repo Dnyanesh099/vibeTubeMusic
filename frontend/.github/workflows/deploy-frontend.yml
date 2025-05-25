@@ -1,28 +1,17 @@
-name: Deploy Frontend
-
-on:
-  push:
-    branches: [main]
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: frontend
-
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build
+      - name: Build project
         run: npm run build
 
       - name: Configure Git Identity
@@ -30,7 +19,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-            
       - name: Deploy to GitHub Pages
         run: |
           npx gh-pages -d build \
