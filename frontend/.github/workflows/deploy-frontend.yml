@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
 
 jobs:
   build-and-deploy-frontend:
@@ -26,11 +25,8 @@ jobs:
         run: npm run build
         working-directory: ./frontend
 
-      - name: Set Git identity
-        run: |
-          git config --global user.email "dnyaneshpatil556@gmail.com"
-          git config --global user.name "Dnyanesh099"
-
       - name: Deploy to GitHub Pages
-        working-directory: ./frontend
-        run: npx gh-pages -d build --repo https://github.com/Dnyanesh099/vibeTubeMusic.git
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend/build
