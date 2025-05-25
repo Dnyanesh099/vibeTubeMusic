@@ -1,19 +1,19 @@
-name: Deploy Frontend to GitHub Pages
+name: Deploy Frontend with gh-pages CLI
 
 on:
   push:
     branches:
-      - main   # or your default branch
+      - main
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Use Node.js 18.x
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -26,10 +26,11 @@ jobs:
         run: npm run build
         working-directory: ./frontend
 
+      - name: Set git user info
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./frontend/build
-          user_name: github-actions[bot]
-          user_email: github-actions[bot]@users.noreply.github.com
+        run: npx gh-pages -d build --repo https://github.com/Dnyanesh099/vibeTubeMusic.git
+        working-directory: ./frontend
