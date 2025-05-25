@@ -1,7 +1,9 @@
-name: Deploy Gradle Spring Boot to Railway
+name: Build React Frontend and Spring Boot Backend
 
 on:
   push:
+    branches: [main]
+  pull_request:
     branches: [main]
 
 jobs:
@@ -12,22 +14,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Java
+      # Build React frontend
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install and Build Frontend
+        working-directory: frontend
+        run: |
+          npm install
+          npm run build
+
+      # Build Spring Boot backend
+      - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Make gradlew executable
-        run: chmod +x backend/musicapp/gradlew
+      - name: Give gradlew permission
+        run: chmod +x backend/gradlew
 
-      - name: Build project with Gradle
-        working-directory: backend/musicapp
-        run: ./gradlew build -x test
-
-      - name: Deploy to Railway
-        uses: railwayapp/cli@v1
-        with:
-          args: up --service musicapp
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      - name: Build Backend
+        working-directory: backend
+        run: ./gradlew build
