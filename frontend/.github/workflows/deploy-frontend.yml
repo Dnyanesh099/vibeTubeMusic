@@ -1,35 +1,24 @@
-name: Deploy Frontend to GitHub Pages
+- uses: actions/checkout@v4
 
-on:
-  push:
-    branches:
-      - main
+- name: Set up Node.js
+  uses: actions/setup-node@v3
+  with:
+    node-version: 18
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+- name: Install dependencies
+  run: npm install
+  working-directory: ./frontend
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+- name: Build frontend
+  run: npm run build
+  working-directory: ./frontend
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
+- name: Configure Git user for deployment
+  run: |
+    git config --global user.email "dnyaneshpatil556@gmail.com"
+    git config --global user.name "Dnyanesh099"
+  working-directory: ./frontend
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: ./frontend
-
-      - name: Build frontend
-        run: npm run build
-        working-directory: ./frontend
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./frontend/build
-          # Optionally set a custom commit message
-          commit_message: "Deploy frontend to GitHub Pages via GitHub Actions"
+- name: Deploy to GitHub Pages
+  run: npx gh-pages -d build --repo https://github.com/Dnyanesh099/vibeTubeMusic.git
+  working-directory: ./frontend
