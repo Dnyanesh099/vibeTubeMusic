@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  build-and-deploy:
+  deploy-frontend:
     runs-on: ubuntu-latest
 
     steps:
