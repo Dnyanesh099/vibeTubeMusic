@@ -34,11 +34,13 @@ jobs:
           java-version: 17
 
       - name: Make gradlew executable
-        run: chmod +x ./gradlew
+        run: chmod +x ./backend/musicapp/gradlew
 
       - name: Build with Gradle
         env:
           SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/musicdb
           SPRING_DATASOURCE_USERNAME: root
           SPRING_DATASOURCE_PASSWORD: dnyanesh
-        run: gradlew build
+        run: |
+          cd backend/musicapp
+          ./gradlew build
