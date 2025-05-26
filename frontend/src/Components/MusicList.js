@@ -562,3 +562,4 @@ function YouTubeStyleMusic() {
     </div>
   );
 }
+export default YouTubeStyleMusic;
