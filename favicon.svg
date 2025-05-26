@@ -1,45 +1,45 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
-  width="220"
-  height="60"
-  viewBox="0 0 220 60"
+  width="600"
+  height="150"
+  viewBox="0 0 600 150"
   role="img"
   aria-label="VibeTube logo"
 >
-  <!-- Outer box -->
+  <!-- Outer pill-shaped box -->
   <rect
-    x="1"
-    y="1"
-    width="218"
-    height="58"
-    rx="12"
-    ry="12"
+    x="5"
+    y="5"
+    width="590"
+    height="140"
+    rx="70"
+    ry="70"
     fill="#fff"
     stroke="#FF0000"
-    stroke-width="3"
+    stroke-width="8"
   />
   
-  <!-- Rounded red rectangle background -->
+  <!-- Rounded red rectangle background (play button background) -->
   <rect
-    x="10"
-    y="10"
-    width="48"
-    height="40"
-    rx="10"
-    ry="10"
+    x="40"
+    y="35"
+    width="80"
+    height="80"
+    rx="30"
+    ry="30"
     fill="#FF0000"
   />
   
   <!-- White play triangle -->
-  <polygon points="26,20 26,40 46,30" fill="#FFFFFF" />
+  <polygon points="65,55 65,105 105,80" fill="#FFFFFF" />
   
   <!-- Text "VibeTube" -->
   <text
-    x="70"
-    y="38"
+    x="150"
+    y="105"
     font-family="Roboto, Arial, sans-serif"
     font-weight="700"
-    font-size="28"
+    font-size="90"
     fill="#282828"
   >
     VibeTube
