@@ -13,7 +13,7 @@ public class WebConfig {
       @Override
       public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-        .allowedOrigins("https://dnyanesh099.github.io", "http://localhost:3000")
+        .allowedOrigins("https://dnyanesh099.github.io", "http://localhost:3000", "https://music-backendvibtube.onrender.com")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
       }
     };

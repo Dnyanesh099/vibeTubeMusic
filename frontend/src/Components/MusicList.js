@@ -372,7 +372,7 @@ function YouTubeStyleMusic() {
 
   useEffect(() => {
     setLoading(true);
-    fetch("http://localhost:8080/music")
+  fetch("https://music-backendvibtube.onrender.com/music")
       .then((res) => {
         if (!res.ok) throw new Error("Network response was not ok");
         return res.json();
