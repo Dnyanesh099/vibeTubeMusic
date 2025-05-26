@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 
+
 function useDebounce(value, delay) {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -335,12 +336,10 @@ function Player({ selectedSong, themeColors }) {
         </div>
       ) : (
         <>
-          <img
-            src="/favicon.svg"
-            alt="App Logo"
+          <img src={`${process.env.PUBLIC_URL}/favicon.svg`} alt="App Logo"
             style={{
-              width: 150,
-              height: 150,
+              width: 170,
+              height: 170,
               marginBottom: 24,
               userSelect: "none",
             }}
