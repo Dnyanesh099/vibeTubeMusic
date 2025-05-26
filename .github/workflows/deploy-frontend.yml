@@ -32,7 +32,7 @@ jobs:
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
     - name: Deploy to GitHub Pages
-      working-directory: ./frontend
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: npx gh-pages -d build --repo https://github.com/Dnyanesh099/vibeTubeMusic.git
+  working-directory: ./frontend
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  run: npx gh-pages -d build --repo https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Dnyanesh099/vibeTubeMusic.git
