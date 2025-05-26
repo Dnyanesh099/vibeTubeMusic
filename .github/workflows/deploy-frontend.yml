@@ -3,31 +3,35 @@ name: Deploy React Frontend
 on:
   push:
     branches:
-      - main
+      - main  # or your default branch name
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '18'  # or your desired Node version
 
-      - name: Install dependencies
+      - name: Install Dependencies
         working-directory: ./frontend
         run: npm install
 
-      - name: Build React app
+      - name: Build React App
         working-directory: ./frontend
         run: npm run build
+
+      - name: Verify Build Output Exists
+        run: ls -la ./frontend/build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./frontend/build
+          enable_jekyll: false
