@@ -3,7 +3,7 @@ name: Deploy React Frontend
 on:
   push:
     branches:
-      - main   # or your default branch
+      - main
 
 jobs:
   build:
@@ -16,19 +16,18 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'  # or your preferred Node version
+          node-version: '18'
 
       - name: Install dependencies
-        working-directory: ./music-app  # Change if your react app folder is different
+        working-directory: ./frontend
         run: npm install
 
       - name: Build React app
-        working-directory: ./music-app
+        working-directory: ./frontend
         run: npm run build
 
-      # Example: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./music-app/build
+          publish_dir: ./frontend/build
