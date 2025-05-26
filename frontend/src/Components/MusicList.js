@@ -407,7 +407,6 @@ function Player({ selectedSong, themeColors, isMobile, setSidebarOpen }) {
     </main>
   );
 }
-
 function YouTubeStyleMusic() {
   const [musicList, setMusicList] = useState([]);
   const [selectedSong, setSelectedSong] = useState(null);
@@ -425,7 +424,6 @@ function YouTubeStyleMusic() {
   const [error, setError] = useState(null);
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
 
-  // New state for mobile detection and sidebar toggle
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -470,20 +468,18 @@ function YouTubeStyleMusic() {
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   const filteredList = useMemo(() => {
-    const filtered = musicList.filter(({ title, id }) => {
+    return musicList.filter(({ title, id }) => {
       if (showOnlyFavorites && !favorites.includes(id)) return false;
       return title.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
     });
-    return filtered;
   }, [musicList, debouncedSearchTerm, favorites, showOnlyFavorites]);
 
-  // Detect window resize and update isMobile accordingly
   useEffect(() => {
     function handleResize() {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
       if (!mobile) {
-        setSidebarOpen(false); // close sidebar on desktop, always visible
+        setSidebarOpen(false);
       }
     }
     window.addEventListener("resize", handleResize);
@@ -497,7 +493,7 @@ function YouTubeStyleMusic() {
         display: "flex",
         backgroundColor: themeColors.background,
         color: themeColors.text,
-        overflow: "hidden",
+        overflowX: "hidden", // ✅ Prevent horizontal scroll
         fontFamily: "Arial, sans-serif",
         flexDirection: isMobile ? "column" : "row",
       }}
@@ -524,8 +520,8 @@ function YouTubeStyleMusic() {
           flex: 1,
           display: "flex",
           flexDirection: "column",
-          marginLeft: isMobile ? 0 : undefined,
           height: isMobile ? "calc(100vh - 56px)" : "100vh",
+          overflow: "hidden",
         }}
       >
         {loading ? (
@@ -566,5 +562,3 @@ function YouTubeStyleMusic() {
     </div>
   );
 }
-
-export default YouTubeStyleMusic;
