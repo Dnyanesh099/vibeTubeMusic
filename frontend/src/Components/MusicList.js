@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 
-
 function useDebounce(value, delay) {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -47,20 +46,30 @@ function Sidebar({
   toggleTheme,
   showOnlyFavorites,
   setShowOnlyFavorites,
+  isMobile,
+  sidebarOpen,
+  setSidebarOpen,
 }) {
   return (
     <aside
       style={{
-        width: 320,
-        borderRight: `1px solid ${themeColors.border}`,
+        width: isMobile ? (sidebarOpen ? "80vw" : 0) : 320,
+        borderRight: isMobile ? "none" : `1px solid ${themeColors.border}`,
         backgroundColor: themeColors.sidebarBg,
         display: "flex",
         flexDirection: "column",
-        padding: "12px 16px",
+        padding: isMobile ? (sidebarOpen ? "12px 16px" : 0) : "12px 16px",
         boxSizing: "border-box",
         overflowY: "auto",
         scrollbarWidth: "auto",
         scrollbarColor: `${themeColors.scrollbarThumb} transparent`,
+        transition: "width 0.3s ease, padding 0.3s ease",
+        position: isMobile ? "fixed" : "relative",
+        top: 0,
+        left: 0,
+        height: "100vh",
+        zIndex: 1000,
+        boxShadow: isMobile && sidebarOpen ? "2px 0 8px rgba(0,0,0,0.3)" : "none",
       }}
       className="sidebar-scrollbar"
     >
@@ -78,11 +87,15 @@ function Sidebar({
               ? "0 1px 2px rgba(0,0,0,0.1)"
               : "0 1px 2px rgba(0,0,0,0.8)",
           backdropFilter: "none",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
         <div
           style={{
-            marginBottom: 16,
+            flex: 1,
+            marginRight: 8,
             display: "flex",
             alignItems: "center",
             gap: 8,
@@ -127,28 +140,48 @@ function Sidebar({
           </button>
         </div>
 
-        <label
-          style={{
-            marginBottom: 12,
-            display: "flex",
-            alignItems: "center",
-            cursor: "pointer",
-            color: themeColors.text,
-            fontSize: 14,
-            userSelect: "none",
-            whiteSpace: "nowrap",
-          }}
-        >
-          <input
-            type="checkbox"
-            checked={showOnlyFavorites}
-            onChange={(e) => setShowOnlyFavorites(e.target.checked)}
-            style={{ marginRight: 6 }}
-            aria-checked={showOnlyFavorites}
-          />
-          Show only favorites
-        </label>
+        {/* Mobile close button */}
+        {isMobile && sidebarOpen && (
+          <button
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close sidebar"
+            style={{
+              border: "none",
+              background: "none",
+              cursor: "pointer",
+              fontSize: 24,
+              color: themeColors.text,
+              userSelect: "none",
+              marginLeft: 8,
+            }}
+          >
+            ×
+          </button>
+        )}
       </div>
+
+      <label
+        style={{
+          marginBottom: 12,
+          display: "flex",
+          alignItems: "center",
+          cursor: "pointer",
+          color: themeColors.text,
+          fontSize: 14,
+          userSelect: "none",
+          whiteSpace: "nowrap",
+          paddingLeft: isMobile ? 0 : undefined,
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={showOnlyFavorites}
+          onChange={(e) => setShowOnlyFavorites(e.target.checked)}
+          style={{ marginRight: 6 }}
+          aria-checked={showOnlyFavorites}
+        />
+        Show only favorites
+      </label>
 
       {filteredList.length === 0 && (
         <p
@@ -295,7 +328,7 @@ function SongItem({
   );
 }
 
-function Player({ selectedSong, themeColors }) {
+function Player({ selectedSong, themeColors, isMobile, setSidebarOpen }) {
   return (
     <main
       style={{
@@ -303,12 +336,34 @@ function Player({ selectedSong, themeColors }) {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        flexDirection: "column", // Added to stack logo and text vertically
+        flexDirection: "column", // stack logo and text vertically
         backgroundColor: themeColors.background,
         padding: 24,
         boxSizing: "border-box",
+        position: "relative",
       }}
     >
+      {isMobile && (
+        <button
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Open sidebar"
+          style={{
+            position: "absolute",
+            top: 16,
+            left: 16,
+            fontSize: 30,
+            cursor: "pointer",
+            border: "none",
+            background: "none",
+            color: themeColors.text,
+            zIndex: 1100,
+            userSelect: "none",
+          }}
+        >
+          ☰
+        </button>
+      )}
+
       {selectedSong ? (
         <div
           style={{
@@ -336,7 +391,9 @@ function Player({ selectedSong, themeColors }) {
         </div>
       ) : (
         <>
-          <img src={`${process.env.PUBLIC_URL}/favicon.svg`} alt="App Logo"
+          <img
+            src={`${process.env.PUBLIC_URL}/favicon.svg`}
+            alt="App Logo"
             style={{
               width: 170,
               height: 170,
@@ -368,11 +425,15 @@ function YouTubeStyleMusic() {
   const [error, setError] = useState(null);
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
 
+  // New state for mobile detection and sidebar toggle
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const themeColors = colors[theme];
 
   useEffect(() => {
     setLoading(true);
-  fetch("https://music-backendvibtube.onrender.com/music")
+    fetch("https://music-backendvibtube.onrender.com/music")
       .then((res) => {
         if (!res.ok) throw new Error("Network response was not ok");
         return res.json();
@@ -416,6 +477,19 @@ function YouTubeStyleMusic() {
     return filtered;
   }, [musicList, debouncedSearchTerm, favorites, showOnlyFavorites]);
 
+  // Detect window resize and update isMobile accordingly
+  useEffect(() => {
+    function handleResize() {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (!mobile) {
+        setSidebarOpen(false); // close sidebar on desktop, always visible
+      }
+    }
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <div
       style={{
@@ -425,6 +499,7 @@ function YouTubeStyleMusic() {
         color: themeColors.text,
         overflow: "hidden",
         fontFamily: "Arial, sans-serif",
+        flexDirection: isMobile ? "column" : "row",
       }}
     >
       <Sidebar
@@ -439,12 +514,18 @@ function YouTubeStyleMusic() {
         toggleTheme={toggleTheme}
         showOnlyFavorites={showOnlyFavorites}
         setShowOnlyFavorites={setShowOnlyFavorites}
+        isMobile={isMobile}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
       />
+
       <div
         style={{
           flex: 1,
           display: "flex",
           flexDirection: "column",
+          marginLeft: isMobile ? 0 : undefined,
+          height: isMobile ? "calc(100vh - 56px)" : "100vh",
         }}
       >
         {loading ? (
@@ -474,7 +555,12 @@ function YouTubeStyleMusic() {
             Error: {error}
           </main>
         ) : (
-          <Player selectedSong={selectedSong} themeColors={themeColors} />
+          <Player
+            selectedSong={selectedSong}
+            themeColors={themeColors}
+            isMobile={isMobile}
+            setSidebarOpen={setSidebarOpen}
+          />
         )}
       </div>
     </div>
