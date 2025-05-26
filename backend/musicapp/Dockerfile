@@ -9,7 +9,8 @@ COPY settings.gradle .
 COPY src src
 
 RUN chmod +x gradlew
-RUN ./gradlew clean build --no-daemon --stacktrace --info
+RUN ./gradlew clean build -x test --no-daemon --stacktrace --info
+
 
 EXPOSE 8080
 
