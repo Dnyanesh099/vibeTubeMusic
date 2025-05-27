@@ -219,7 +219,7 @@ function Sidebar({
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
               flex: 1,
-              padding: 8,
+              padding:5,
               fontSize: 14,
               borderRadius: 4,
               border: `1px solid ${themeColors.inputBorder}`,
