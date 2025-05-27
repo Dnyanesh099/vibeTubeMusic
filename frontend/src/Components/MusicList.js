@@ -423,7 +423,7 @@ function YouTubeStyleMusic() {
     // Fetch music list only once
     async function fetchList() {
       try {
-        const res = await fetch("/musicList.json");
+        const res = await fetch("https://music-backendvibtube.onrender.com/music");
         const json = await res.json();
         setMusicList(json);
       } catch (e) {
