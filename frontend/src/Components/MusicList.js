@@ -140,24 +140,7 @@ function Sidebar({
           </button>
         </div>
 
-        {/* Mobile close button */}
-        {isMobile && sidebarOpen && (
-          <button
-            onClick={() => setSidebarOpen(false)}
-            aria-label="Close sidebar"
-            style={{
-              border: "none",
-              background: "none",
-              cursor: "pointer",
-              fontSize: 24,
-              color: themeColors.text,
-              userSelect: "none",
-              marginLeft: 8,
-            }}
-          >
-            ×
-          </button>
-        )}
+        {/* Removed Mobile close button as requested */}
       </div>
 
       <label
@@ -210,6 +193,8 @@ function Sidebar({
             selected={selectedSong?.videoId === videoId}
             setSelectedSong={setSelectedSong}
             themeColors={themeColors}
+            isMobile={isMobile}               // NEW
+            setSidebarOpen={setSidebarOpen}   // NEW
           />
         );
       })}
@@ -227,6 +212,8 @@ function SongItem({
   selected,
   setSelectedSong,
   themeColors,
+  isMobile,             // NEW
+  setSidebarOpen,       // NEW
 }) {
   const [hovered, setHovered] = useState(false);
   const bgColor = selected
@@ -253,7 +240,10 @@ function SongItem({
 
   return (
     <div
-      onClick={() => setSelectedSong({ title, videoId })}
+      onClick={() => {
+        setSelectedSong({ title, videoId });
+        if (isMobile) setSidebarOpen(false);  // CLOSE SIDEBAR ON MOBILE
+      }}
       style={{
         display: "flex",
         cursor: "pointer",
@@ -272,6 +262,7 @@ function SongItem({
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           setSelectedSong({ title, videoId });
+          if (isMobile) setSidebarOpen(false);
         }
       }}
       role="button"
@@ -413,39 +404,33 @@ function YouTubeStyleMusic() {
   const [selectedSong, setSelectedSong] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [favorites, setFavorites] = useState(() => {
-    try {
-      const saved = localStorage.getItem("favorites");
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
+    const saved = localStorage.getItem("favorites");
+    return saved ? JSON.parse(saved) : [];
   });
-  const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
-
-  // New state for mobile detection and sidebar toggle
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const themeColors = colors[theme];
+  const [theme, setTheme] = useState(() => {
+    return window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  });
+  const [isMobile, setIsMobile] = useState(
+    window.matchMedia("(max-width: 640px)").matches
+  );
+  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
 
   useEffect(() => {
-    setLoading(true);
-    fetch("https://music-backendvibtube.onrender.com/music")
-      .then((res) => {
-        if (!res.ok) throw new Error("Network response was not ok");
-        return res.json();
-      })
-      .then((data) => {
-        setMusicList(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+    // Fetch music list only once
+    async function fetchList() {
+      try {
+        const res = await fetch("/musicList.json");
+        const json = await res.json();
+        setMusicList(json);
+      } catch (e) {
+        console.error("Failed to load music list:", e);
+      }
+    }
+    fetchList();
   }, []);
 
   useEffect(() => {
@@ -453,53 +438,57 @@ function YouTubeStyleMusic() {
   }, [favorites]);
 
   useEffect(() => {
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+    function onResize() {
+      const mobile = window.matchMedia("(max-width: 640px)").matches;
+      setIsMobile(mobile);
+      if (!mobile) {
+        setSidebarOpen(true);
+      } else {
+        setSidebarOpen(false);
+      }
+    }
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   const toggleFavorite = useCallback(
     (id) => {
       setFavorites((prev) =>
-        prev.includes(id) ? prev.filter((fid) => fid !== id) : [...prev, id]
+        prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
       );
     },
     [setFavorites]
   );
 
-  const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
+  const toggleTheme = () => setTheme((t) => (t === "light" ? "dark" : "light"));
 
-  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const themeColors = colors[theme];
+
+  const debouncedSearch = useDebounce(searchTerm, 300);
 
   const filteredList = useMemo(() => {
-    const filtered = musicList.filter(({ title, id }) => {
-      if (showOnlyFavorites && !favorites.includes(id)) return false;
-      return title.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
-    });
-    return filtered;
-  }, [musicList, debouncedSearchTerm, favorites, showOnlyFavorites]);
+    const list = showOnlyFavorites
+      ? musicList.filter((item) => favorites.includes(item.id))
+      : musicList;
+    if (!debouncedSearch) return list;
 
-  // Detect window resize and update isMobile accordingly
-  useEffect(() => {
-    function handleResize() {
-      const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
-      if (!mobile) {
-        setSidebarOpen(false); // close sidebar on desktop, always visible
-      }
-    }
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    const lower = debouncedSearch.toLowerCase();
+    return list.filter(
+      (item) =>
+        item.title.toLowerCase().includes(lower) ||
+        item.videoId.toLowerCase().includes(lower)
+    );
+  }, [musicList, favorites, showOnlyFavorites, debouncedSearch]);
 
   return (
     <div
       style={{
-        height: "100vh",
         display: "flex",
+        height: "100vh",
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         backgroundColor: themeColors.background,
         color: themeColors.text,
         overflow: "hidden",
-        fontFamily: "Arial, sans-serif",
-        flexDirection: isMobile ? "column" : "row",
       }}
     >
       <Sidebar
@@ -518,51 +507,12 @@ function YouTubeStyleMusic() {
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
       />
-
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          marginLeft: isMobile ? 0 : undefined,
-          height: isMobile ? "calc(100vh - 56px)" : "100vh",
-        }}
-      >
-        {loading ? (
-          <main
-            style={{
-              flex: 1,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              fontSize: 20,
-              color: themeColors.text,
-            }}
-          >
-            Loading songs...
-          </main>
-        ) : error ? (
-          <main
-            style={{
-              flex: 1,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              fontSize: 20,
-              color: "red",
-            }}
-          >
-            Error: {error}
-          </main>
-        ) : (
-          <Player
-            selectedSong={selectedSong}
-            themeColors={themeColors}
-            isMobile={isMobile}
-            setSidebarOpen={setSidebarOpen}
-          />
-        )}
-      </div>
+      <Player
+        selectedSong={selectedSong}
+        themeColors={themeColors}
+        isMobile={isMobile}
+        setSidebarOpen={setSidebarOpen}
+      />
     </div>
   );
 }
