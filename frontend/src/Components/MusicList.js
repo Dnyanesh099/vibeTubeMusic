@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 
+// Debounce hook
 function useDebounce(value, delay) {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -9,6 +10,7 @@ function useDebounce(value, delay) {
   return debounced;
 }
 
+// Theme colors
 const colors = {
   light: {
     background: "#fff",
@@ -34,174 +36,7 @@ const colors = {
   },
 };
 
-function Sidebar({
-  themeColors,
-  filteredList,
-  favorites,
-  toggleFavorite,
-  selectedSong,
-  setSelectedSong,
-  searchTerm,
-  setSearchTerm,
-  toggleTheme,
-  showOnlyFavorites,
-  setShowOnlyFavorites,
-  isMobile,
-  sidebarOpen,
-  setSidebarOpen,
-}) {
-  return (
-    <aside
-      style={{
-        width: isMobile ? (sidebarOpen ? "80vw" : 0) : 320,
-        borderRight: isMobile ? "none" : `1px solid ${themeColors.border}`,
-        backgroundColor: themeColors.sidebarBg,
-        display: "flex",
-        flexDirection: "column",
-        padding: isMobile ? (sidebarOpen ? "12px 16px" : 0) : "12px 16px",
-        boxSizing: "border-box",
-        overflowY: "auto",
-        scrollbarWidth: "auto",
-        scrollbarColor: `${themeColors.scrollbarThumb} transparent`,
-        transition: "width 0.3s ease, padding 0.3s ease",
-        position: isMobile ? "fixed" : "relative",
-        top: 0,
-        left: 0,
-        height: "100vh",
-        zIndex: 1000,
-        boxShadow: isMobile && sidebarOpen ? "2px 0 8px rgba(0,0,0,0.3)" : "none",
-      }}
-      className="sidebar-scrollbar"
-    >
-      {/* Sticky header container */}
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          backgroundColor: themeColors.sidebarBg,
-          padding: "12px 16px 12px 16px",
-          zIndex: 10,
-          borderBottom: `1px solid ${themeColors.border}`,
-          boxShadow:
-            themeColors === colors.light
-              ? "0 1px 2px rgba(0,0,0,0.1)"
-              : "0 1px 2px rgba(0,0,0,0.8)",
-          backdropFilter: "none",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <div
-          style={{
-            flex: 1,
-            marginRight: 8,
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-          }}
-        >
-          <input
-            type="search"
-            placeholder="Search"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              flex: 1,
-              padding: 8,
-              fontSize: 14,
-              borderRadius: 4,
-              border: `1px solid ${themeColors.inputBorder}`,
-              backgroundColor: themeColors.inputBg,
-              color: themeColors.text,
-              outline: "none",
-              transition: "border-color 0.3s",
-            }}
-            onFocus={(e) =>
-              (e.target.style.borderColor = themeColors.inputFocusBorder)
-            }
-            onBlur={(e) => (e.target.style.borderColor = themeColors.inputBorder)}
-            aria-label="Search songs"
-          />
-          <button
-            onClick={toggleTheme}
-            aria-label="Toggle dark/light theme"
-            title="Toggle dark/light theme"
-            style={{
-              border: "none",
-              background: "none",
-              cursor: "pointer",
-              fontSize: 20,
-              color: themeColors.text,
-              userSelect: "none",
-            }}
-          >
-            {themeColors === colors.light ? "🌙" : "☀️"}
-          </button>
-        </div>
-
-        {/* Removed Mobile close button as requested */}
-      </div>
-
-      <label
-        style={{
-          marginBottom: 12,
-          display: "flex",
-          alignItems: "center",
-          cursor: "pointer",
-          color: themeColors.text,
-          fontSize: 14,
-          userSelect: "none",
-          whiteSpace: "nowrap",
-          paddingLeft: isMobile ? 0 : undefined,
-        }}
-      >
-        <input
-          type="checkbox"
-          checked={showOnlyFavorites}
-          onChange={(e) => setShowOnlyFavorites(e.target.checked)}
-          style={{ marginRight: 6 }}
-          aria-checked={showOnlyFavorites}
-        />
-        Show only favorites
-      </label>
-
-      {filteredList.length === 0 && (
-        <p
-          style={{
-            textAlign: "center",
-            color: themeColors.text,
-            opacity: 0.6,
-            userSelect: "none",
-          }}
-        >
-          No songs found
-        </p>
-      )}
-
-      {filteredList.map(({ id, title, videoId, imageUrl }) => {
-        const isFav = favorites.includes(id);
-        return (
-          <SongItem
-            key={id}
-            id={id}
-            title={title}
-            videoId={videoId}
-            imageUrl={imageUrl}
-            isFav={isFav}
-            toggleFavorite={toggleFavorite}
-            selected={selectedSong?.videoId === videoId}
-            setSelectedSong={setSelectedSong}
-            themeColors={themeColors}
-            isMobile={isMobile}               // NEW
-            setSidebarOpen={setSidebarOpen}   // NEW
-          />
-        );
-      })}
-    </aside>
-  );
-}
-
+// Song item component
 function SongItem({
   id,
   title,
@@ -212,8 +47,8 @@ function SongItem({
   selected,
   setSelectedSong,
   themeColors,
-  isMobile,             // NEW
-  setSidebarOpen,       // NEW
+  isMobile,
+  setSidebarOpen,
 }) {
   const [hovered, setHovered] = useState(false);
   const bgColor = selected
@@ -242,7 +77,7 @@ function SongItem({
     <div
       onClick={() => {
         setSelectedSong({ title, videoId });
-        if (isMobile) setSidebarOpen(false);  // CLOSE SIDEBAR ON MOBILE
+        if (isMobile) setSidebarOpen(false);
       }}
       style={{
         display: "flex",
@@ -319,6 +154,146 @@ function SongItem({
   );
 }
 
+// Sidebar component
+function Sidebar({
+  themeColors,
+  filteredList,
+  favorites,
+  toggleFavorite,
+  selectedSong,
+  setSelectedSong,
+  searchTerm,
+  setSearchTerm,
+  toggleTheme,
+  showOnlyFavorites,
+  setShowOnlyFavorites,
+  isMobile,
+  sidebarOpen,
+  setSidebarOpen,
+}) {
+  return (
+    <aside
+      style={{
+        width: isMobile ? (sidebarOpen ? "80vw" : 0) : 320,
+        borderRight: isMobile ? "none" : `1px solid ${themeColors.border}`,
+        backgroundColor: themeColors.sidebarBg,
+        display: "flex",
+        flexDirection: "column",
+        padding: isMobile ? (sidebarOpen ? "12px 16px" : 0) : "12px 16px",
+        boxSizing: "border-box",
+        overflowY: "auto",
+        scrollbarWidth: "auto",
+        scrollbarColor: `${themeColors.scrollbarThumb} transparent`,
+        transition: "width 0.3s ease, padding 0.3s ease",
+        position: isMobile ? "fixed" : "relative",
+        top: 0,
+        left: 0,
+        height: "100vh",
+        zIndex: 1000,
+        boxShadow: isMobile && sidebarOpen ? "2px 0 8px rgba(0,0,0,0.3)" : "none",
+      }}
+      className="sidebar-scrollbar"
+    >
+      <div
+        style={{
+          position: "sticky",
+          top: 0,
+          backgroundColor: themeColors.sidebarBg,
+          padding: "12px 16px",
+          zIndex: 10,
+          borderBottom: `1px solid ${themeColors.border}`,
+          boxShadow:
+            themeColors === colors.light
+              ? "0 1px 2px rgba(0,0,0,0.1)"
+              : "0 1px 2px rgba(0,0,0,0.8)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <div style={{ flex: 1, marginRight: 8, display: "flex", gap: 8 }}>
+          <input
+            type="search"
+            placeholder="Search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+              flex: 1,
+              padding: 8,
+              fontSize: 14,
+              borderRadius: 4,
+              border: `1px solid ${themeColors.inputBorder}`,
+              backgroundColor: themeColors.inputBg,
+              color: themeColors.text,
+              outline: "none",
+              transition: "border-color 0.3s",
+            }}
+            onFocus={(e) =>
+              (e.target.style.borderColor = themeColors.inputFocusBorder)
+            }
+            onBlur={(e) =>
+              (e.target.style.borderColor = themeColors.inputBorder)
+            }
+            aria-label="Search songs"
+          />
+          <button
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+            style={{
+              border: "none",
+              background: "none",
+              cursor: "pointer",
+              fontSize: 20,
+              color: themeColors.text,
+            }}
+          >
+            {themeColors === colors.light ? "🌙" : "☀️"}
+          </button>
+        </div>
+      </div>
+
+      <label
+        style={{
+          margin: "12px 0",
+          display: "flex",
+          alignItems: "center",
+          fontSize: 14,
+          color: themeColors.text,
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={showOnlyFavorites}
+          onChange={(e) => setShowOnlyFavorites(e.target.checked)}
+          style={{ marginRight: 6 }}
+        />
+        Show only favorites
+      </label>
+
+      {filteredList.length === 0 && (
+        <p style={{ textAlign: "center", color: themeColors.text, opacity: 0.6 }}>
+          No songs found
+        </p>
+      )}
+
+      {filteredList.map((song) => (
+        <SongItem
+          key={song.id}
+          {...song}
+          isFav={favorites.includes(song.id)}
+          toggleFavorite={toggleFavorite}
+          selected={selectedSong?.videoId === song.videoId}
+          setSelectedSong={setSelectedSong}
+          themeColors={themeColors}
+          isMobile={isMobile}
+          setSidebarOpen={setSidebarOpen}
+        />
+      ))}
+    </aside>
+  );
+}
+
+// Player component
 function Player({ selectedSong, themeColors, isMobile, setSidebarOpen }) {
   return (
     <main
@@ -327,28 +302,25 @@ function Player({ selectedSong, themeColors, isMobile, setSidebarOpen }) {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        flexDirection: "column", // stack logo and text vertically
+        flexDirection: "column",
         backgroundColor: themeColors.background,
         padding: 24,
-        boxSizing: "border-box",
         position: "relative",
       }}
     >
       {isMobile && (
         <button
           onClick={() => setSidebarOpen(true)}
-          aria-label="Open sidebar"
           style={{
             position: "absolute",
             top: 16,
             left: 16,
             fontSize: 30,
-            cursor: "pointer",
             border: "none",
             background: "none",
             color: themeColors.text,
+            cursor: "pointer",
             zIndex: 1100,
-            userSelect: "none",
           }}
         >
           ☰
@@ -361,10 +333,6 @@ function Player({ selectedSong, themeColors, isMobile, setSidebarOpen }) {
             width: "100%",
             maxWidth: 800,
             aspectRatio: "16 / 9",
-            boxShadow:
-              themeColors === colors.light
-                ? "0 4px 15px rgba(0,0,0,0.1)"
-                : "0 4px 20px rgba(0,0,0,0.6)",
             borderRadius: 8,
             overflow: "hidden",
             backgroundColor: "#000",
@@ -381,53 +349,41 @@ function Player({ selectedSong, themeColors, isMobile, setSidebarOpen }) {
           />
         </div>
       ) : (
-        <>
-          <img
-            src={`${process.env.PUBLIC_URL}/favicon.svg`}
-            alt="App Logo"
-            style={{
-              width: 170,
-              height: 170,
-              marginBottom: 24,
-              userSelect: "none",
-            }}
-            loading="lazy"
-          />
-        </>
+        <img
+          src={`${process.env.PUBLIC_URL}/favicon.svg`}
+          alt="App Logo"
+          style={{ width: 170, height: 170 }}
+        />
       )}
     </main>
   );
 }
 
+// Main component
 function YouTubeStyleMusic() {
   const [musicList, setMusicList] = useState([]);
   const [selectedSong, setSelectedSong] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [favorites, setFavorites] = useState(() => {
-    const saved = localStorage.getItem("favorites");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [favorites, setFavorites] = useState(() =>
+    JSON.parse(localStorage.getItem("favorites") || "[]")
+  );
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
-  const [theme, setTheme] = useState(() => {
-    return window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-  });
+  const [theme, setTheme] = useState(() =>
+    window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+  );
   const [isMobile, setIsMobile] = useState(
     window.matchMedia("(max-width: 640px)").matches
   );
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
 
   useEffect(() => {
-    // Fetch music list only once
     async function fetchList() {
       try {
         const res = await fetch("https://music-backendvibtube.onrender.com/music");
         const json = await res.json();
         setMusicList(json);
       } catch (e) {
-        console.error("Failed to load music list:", e);
+        console.error("Failed to fetch music list", e);
       }
     }
     fetchList();
@@ -438,40 +394,31 @@ function YouTubeStyleMusic() {
   }, [favorites]);
 
   useEffect(() => {
-    function onResize() {
+    const handleResize = () => {
       const mobile = window.matchMedia("(max-width: 640px)").matches;
       setIsMobile(mobile);
-      if (!mobile) {
-        setSidebarOpen(true);
-      } else {
-        setSidebarOpen(false);
-      }
-    }
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+      setSidebarOpen(!mobile);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const toggleFavorite = useCallback(
-    (id) => {
+    (id) =>
       setFavorites((prev) =>
         prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
-      );
-    },
-    [setFavorites]
+      ),
+    []
   );
 
   const toggleTheme = () => setTheme((t) => (t === "light" ? "dark" : "light"));
-
   const themeColors = colors[theme];
-
   const debouncedSearch = useDebounce(searchTerm, 300);
 
   const filteredList = useMemo(() => {
     const list = showOnlyFavorites
       ? musicList.filter((item) => favorites.includes(item.id))
       : musicList;
-    if (!debouncedSearch) return list;
-
     const lower = debouncedSearch.toLowerCase();
     return list.filter(
       (item) =>
@@ -485,7 +432,6 @@ function YouTubeStyleMusic() {
       style={{
         display: "flex",
         height: "100vh",
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         backgroundColor: themeColors.background,
         color: themeColors.text,
         overflow: "hidden",
